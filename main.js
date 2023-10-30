@@ -31,8 +31,10 @@ class Particle {
       this.vy = newVy;
 
       other.isDead = true;
-      this.mass += Math.pow(other.mass, 1.01);
+      this.mass += other.mass//Math.pow(other.mass, 1.01);
+      return true;
     }
+    return false;
   }
 
   update() {
@@ -42,7 +44,7 @@ class Particle {
 
     this.vx = Math.min(Math.max(this.vx, -speedLimit), speedLimit);
     this.vy = Math.min(Math.max(this.vy, -speedLimit), speedLimit);
-    
+
     this.x += (this.vx + oldVx) / 2;
     this.y += (this.vy + oldVy) / 2;
     // Boundary checks for x
@@ -87,15 +89,25 @@ function animate() {
   context.fillStyle = 'black';
   context.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Update particle positions and handle pulling particles together
+  let toRemove = new Set();  // To keep track of particles that should be removed
+
   for (let i = 0; i < particles.length; i++) {
     for (let j = i + 1; j < particles.length; j++) {
-      particles[j].Pull(particles[i]);
+      if (particles[i].Pull(particles[j])) {
+        particles[i].mass += Math.pow(particles[j].mass, 1.01);
+        toRemove.add(j);
+      } else if (particles[j].Pull(particles[i])) {
+        particles[j].mass += Math.pow(particles[i].mass, 1.01);
+        toRemove.add(i);
+      }
     }
     particles[i].update();
     particles[i].render();
   }
-  particles = particles.filter(p => !p.isDead);
+
+  // Remove particles that were involved in a merge
+  particles = particles.filter((_, index) => !toRemove.has(index));
+
   requestAnimationFrame(animate);
 }
 
