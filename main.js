@@ -76,7 +76,7 @@ class Particle {
 
 let particles = [];
 
-// Initialize some random particles
+// Creates random particles
 for (let i = 0; i < 100; i++) {
   const x = Math.random() * canvas.width;
   const y = Math.random() * canvas.height;
@@ -89,7 +89,7 @@ function animate() {
   context.fillStyle = 'black';
   context.fillRect(0, 0, canvas.width, canvas.height);
 
-  let toRemove = new Set();  // To keep track of particles that should be removed
+  let toRemove = new Set();
 
   for (let i = 0; i < particles.length; i++) {
     for (let j = i + 1; j < particles.length; j++) {
